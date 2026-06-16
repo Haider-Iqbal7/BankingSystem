@@ -2,11 +2,11 @@ import java.util.*;
 
 public class BankDatabase {
     HashMap<String, Accounts> accountsMap;
-    HashMap<String, Transaction> transactionMap;
+    HashMap<String, ArrayList<Transaction>> transactionMap;
     LinkedList<QueueToken> bankQueue;
     TreeSet<Accounts> sortedAccounts;
     TreeMap<String, ArrayList<Loan>> loanMap;
-    Stack<String> stackOperation;
+    Stack<String> operationStack;
     ArrayList<Admin> adminList;
     AccountBST accountBST;
     int accountCenter = 10000;
@@ -18,7 +18,7 @@ public class BankDatabase {
         bankQueue = new LinkedList<>();
         sortedAccounts = new TreeSet<>();
         loanMap = new TreeMap<>();
-        stackOperation = new Stack<>();
+        operationStack = new Stack<>();
         adminList = new ArrayList<>();
         accountBST = new AccountBST();
         initializeDemoData();
@@ -36,12 +36,13 @@ public String generateAccountNumber() {
 }
 
     public boolean addAccount(Accounts acc) {
-        if (accountsMap.containsKey(acc.getAccountNumber())) return false;
+        if (accountsMap.containsKey(acc.getAccountNumber()))
+            return false;
         accountsMap.put(acc.getAccountNumber(), acc);
         transactionMap.put(acc.getAccountNumber(), new ArrayList<>());
         sortedAccounts.add(acc);
         accountBST.insert(acc);
-        stackOperation.push("ADD_ACCOUNT:" + acc.getAccountNumber());
+        operationStack.push("ADD_ACCOUNT:" + acc.getAccountNumber());
         return true;
     }
     // BST is keyed by balance, which changes on every transaction.
@@ -59,7 +60,7 @@ public String generateAccountNumber() {
         Accounts acc = accountsMap.get(accNo);
         if (acc == null) return false;
         acc.setActive(false);
-        stackOperation.push("DELETE_ACCOUNT:" + accNo);
+        operationStack.push("DELETE_ACCOUNT:" + accNo);
         return true;
     }
     public Collection<Accounts> getAllAccounts() {
@@ -77,7 +78,7 @@ public String generateAccountNumber() {
 
     public void addTransaction(Transaction txn) {
         transactionMap.computeIfAbsent(txn.getAccountNumber(), k -> new ArrayList<>()).add(txn);
-        stackOperation.push("TRANSACTION:" + txn.getTransactionId());
+        operationStack.push("TRANSACTION:" + txn.getTransactionId());
     }
 
     public ArrayList<Transaction> getTransactions(String accNo) {
@@ -109,14 +110,14 @@ public String generateAccountNumber() {
             }
         }
         bankQueue.add(insertIdx, token);
-        stackOperation.push("QUEUE_ADD:" + token.getTokenNumber());
+        operationStack.push("QUEUE_ADD:" + token.getTokenNumber());
     }
 
     public QueueToken dequeueToken() {
         if (bankQueue.isEmpty()) return null;
         QueueToken token = bankQueue.poll();
         token.markServing();
-        stackOperation.push("QUEUE_SERVE:" + token.getTokenNumber());
+        operationStack.push("QUEUE_SERVE:" + token.getTokenNumber());
         return token;
     }
 
@@ -136,7 +137,7 @@ public String generateAccountNumber() {
 
     public void addLoan(Loan loan) {
         loanMap.computeIfAbsent(loan.getAccountNumber(), k -> new ArrayList<>()).add(loan);
-        stackOperation.push("LOAN_APPLY:" + loan.getLoanId());
+        operationStack.push("LOAN_APPLY:" + loan.getLoanId());
     }
 
     public ArrayList<Loan> getLoans(String accNo) {
@@ -182,12 +183,13 @@ public String generateAccountNumber() {
     // ========== STACK / AUDIT ==========
 
     public Stack<String> getOperationStack() {
-        return stackOperation;
+        return operationStack;
     }
 
     public String undoLastOperation() {
-        if (stackOperation.isEmpty()) return null;
-        return stackOperation.pop();
+        if (operationStack.isEmpty())
+            return null;
+        return operationStack.pop();
     }
 // ========== REPORTS ==========
 
@@ -233,9 +235,9 @@ public String generateAccountNumber() {
 
     private void initializeDemoData() {
         // Admins
-        adminList.add(new Admin("A001", "admin", "admin123", "Super Administrator", Admin.AdminRole.SUPER_ADMIN));
-        adminList.add(new Admin("A002", "manager", "mgr123", "Bank Manager", Admin.AdminRole.MANAGER));
-        adminList.add(new Admin("A003", "teller1", "teller123", "Teller One", Admin.AdminRole.TELLER));
+        adminList.add(new Admin("A001", "admin", "admin123", "Super Administrator", Admin.AdminRole.Super_Admin));
+        adminList.add(new Admin("A002", "manager", "mgr123", "Bank Manager", Admin.AdminRole.Manager));
+        adminList.add(new Admin("A003", "teller1", "teller123", "Teller One", Admin.AdminRole.Teller));
 
         // Sample accounts
         Accounts a1= new Accounts("PKB10001", "Ali Hassan", "35202-1234567-1",

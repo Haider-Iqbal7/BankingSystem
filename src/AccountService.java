@@ -125,4 +125,23 @@ public class AccountService {
     public ArrayList<Transaction> getTransactionHistory(String accNo) {
         return db.getTransactions(accNo);
     }
+    public String listAdmins() {
+        StringBuilder sb = new StringBuilder("\n── All Admins ──\n");
+        ArrayList<Admin> admins = BankDatabase.getInstance().getAllAdmins();
+        if (admins.isEmpty()) {
+            return "No admins found!";
+        }
+        for (Admin admin : admins) {
+            sb.append(admin).append("\n");
+        }
+        return sb.toString();
+    }
+
+    public String addAdmin(String username, String password, String fullName, Admin.AdminRole role) {
+        Admin newAdmin = new Admin("A" + System.currentTimeMillis(), username, password, fullName, role);
+        if (BankDatabase.getInstance().addAdmin(newAdmin)) {
+            return "✅ Admin added successfully! ID: " + newAdmin.getAdminId();
+        }
+        return "❌ Admin with username '" + username + "' already exists!";
+    }
 }

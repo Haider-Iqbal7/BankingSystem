@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class ConsoleUI {
-    private Scanner obj = new Scanner(System.in);
+    private Scanner sc = new Scanner(System.in);
     private AccountService accountService = new AccountService();
     private LoanService loanService = new LoanService();
     private QueueService queueService = new QueueService();
@@ -29,10 +29,10 @@ public class ConsoleUI {
         System.out.println("═══════════════ ADMIN LOGIN ═══════════════");
         for (int attempts = 0; attempts < 3; attempts++) {
             System.out.print("Username: ");
-            String user = obj.nextLine().trim();
+            String user = sc.nextLine().trim();
             System.out.print("Password: ");
-            String pass = obj.nextLine().trim();
-            com.smartbank.dao.BankDatabase db = com.smartbank.dao.BankDatabase.getInstance();
+            String pass = sc.nextLine().trim();
+            BankDatabase db = BankDatabase.getInstance();
             loggedInAdmin = db.authenticate(user, pass);
             if (loggedInAdmin != null) {
                 System.out.println("\n✔ Welcome, " + loggedInAdmin.getFullName() + " [" + loggedInAdmin.getRole() + "]");
@@ -60,7 +60,7 @@ public class ConsoleUI {
             System.out.println("║  0. Exit                             ║");
             System.out.println("╚══════════════════════════════════════╝");
             System.out.print("Choice: ");
-            String choice = obj.nextLine().trim();
+            String choice = sc.nextLine().trim();
             switch (choice) {
                 case "1":
                     accountMenu();
@@ -106,7 +106,7 @@ public class ConsoleUI {
             System.out.println("6. Change PIN");
             System.out.println("0. Back");
             System.out.print("Choice: ");
-            switch (obj.nextLine().trim()) {
+            switch (sc.nextLine().trim()) {
                 case "1":
                     createAccount();
                     break;
@@ -134,25 +134,25 @@ public class ConsoleUI {
     private void createAccount() {
         System.out.println("\n── Create New Account ──");
         System.out.print("Full Name       : ");
-        String name = obj.nextLine().trim();
+        String name = sc.nextLine().trim();
         System.out.print("CNIC (XXXXX-XXXXXXX-X): ");
-        String cnic = obj.nextLine().trim();
+        String cnic = sc.nextLine().trim();
         System.out.print("Phone           : ");
-        String phone = obj.nextLine().trim();
+        String phone = sc.nextLine().trim();
         System.out.print("Address         : ");
-        String address = obj.nextLine().trim();
+        String address = sc.nextLine().trim();
         System.out.println("Account Type: 1=SAVINGS  2=CURRENT  3=FIXED_DEPOSIT");
         System.out.print("Choice          : ");
-        String typeChoice = obj.nextLine().trim();
+        String typeChoice = sc.nextLine().trim();
         Accounts.AccountType type = switch (typeChoice) {
             case "2" -> Accounts.AccountType.CURRENT;
             case "3" -> Accounts.AccountType.FIXED_DEPOSIT;
             default -> Accounts.AccountType.SAVINGS;
         };
         System.out.print("Initial Deposit : PKR ");
-        double deposit = Double.parseDouble(obj.nextLine().trim());
+        double deposit = Double.parseDouble(sc.nextLine().trim());
         System.out.print("Set 4-digit PIN : ");
-        String pin = obj.nextLine().trim();
+        String pin = sc.nextLine().trim();
 
         String result = accountService.createAccount(name, cnic, phone, address, type, deposit, pin);
         if (result.startsWith("SUCCESS")) {
@@ -164,7 +164,7 @@ public class ConsoleUI {
 
     private void viewAccount() {
         System.out.print("Enter Account Number: ");
-        String accNo = obj.nextLine().trim();
+        String accNo = sc.nextLine().trim();
         Accounts acc = accountService.getAccount(accNo);
         if (acc == null) {
             System.out.println("✘ Account not found!");
@@ -184,19 +184,19 @@ public class ConsoleUI {
 
     private void updateAccount() {
         System.out.print("Enter Account Number: ");
-        String accNo = obj.nextLine().trim();
+        String accNo = sc.nextLine().trim();
         System.out.print("New Phone (leave blank to skip): ");
-        String phone = obj.nextLine().trim();
+        String phone = sc.nextLine().trim();
         System.out.print("New Address (leave blank to skip): ");
-        String addr = obj.nextLine().trim();
+        String addr = sc.nextLine().trim();
         System.out.println(accountService.updateAccount(accNo, phone, addr));
     }
 
     private void closeAccount() {
         System.out.print("Enter Account Number: ");
-        String accNo = obj.nextLine().trim();
+        String accNo = sc.nextLine().trim();
         System.out.print("Enter PIN: ");
-        String pin = obj.nextLine().trim();
+        String pin = sc.nextLine().trim();
         System.out.println(accountService.closeAccount(accNo, pin));
     }
 
@@ -216,11 +216,11 @@ public class ConsoleUI {
 
     private void changePin() {
         System.out.print("Account Number : ");
-        String accNo = obj.nextLine().trim();
+        String accNo = sc.nextLine().trim();
         System.out.print("Old PIN        : ");
-        String oldPin = obj.nextLine().trim();
+        String oldPin = sc.nextLine().trim();
         System.out.print("New PIN        : ");
-        String newPin = obj.nextLine().trim();
+        String newPin = sc.nextLine().trim();
         System.out.println(accountService.changePin(accNo, oldPin, newPin));
     }
 
@@ -234,7 +234,7 @@ public class ConsoleUI {
             System.out.println("4. View Transaction History");
             System.out.println("0. Back");
             System.out.print("Choice: ");
-            switch (obj.nextLine().trim()) {
+            switch (sc.nextLine().trim()) {
                 case "1":
                     deposit();
                     break;
@@ -255,39 +255,40 @@ public class ConsoleUI {
 
     private void deposit() {
         System.out.print("Account Number : ");
-        String accNo = obj.nextLine().trim();
+        String accNo = sc.nextLine().trim();
         System.out.print("Amount         : PKR ");
-        double amt = Double.parseDouble(obj.nextLine().trim());
+        double amt = Double.parseDouble(sc.nextLine().trim());
         System.out.print("Description    : ");
-        String desc = obj.nextLine().trim();
+        String desc = sc.nextLine().trim();
         System.out.println(accountService.deposit(accNo, amt, desc));
     }
 
     private void withdraw() {
         System.out.print("Account Number : ");
-        String accNo = obj.nextLine().trim();
+        String accNo = sc
+                .nextLine().trim();
         System.out.print("PIN            : ");
-        String pin = obj.nextLine().trim();
+        String pin = sc.nextLine().trim();
         System.out.print("Amount         : PKR ");
-        double amt = Double.parseDouble(obj.nextLine().trim());
+        double amt = Double.parseDouble(sc.nextLine().trim());
         System.out.println(accountService.withdraw(accNo, amt, pin));
     }
 
     private void transfer() {
         System.out.print("From Account   : ");
-        String from = obj.nextLine().trim();
+        String from = sc.nextLine().trim();
         System.out.print("To Account     : ");
-        String to = obj.nextLine().trim();
+        String to = sc.nextLine().trim();
         System.out.print("Amount         : PKR ");
-        double amt = Double.parseDouble(obj.nextLine().trim());
+        double amt = Double.parseDouble(sc.nextLine().trim());
         System.out.print("PIN            : ");
-        String pin = obj.nextLine().trim();
+        String pin = sc.nextLine().trim();
         System.out.println(accountService.transfer(from, to, amt, pin));
     }
 
     private void viewHistory() {
         System.out.print("Account Number: ");
-        String accNo = obj.nextLine().trim();
+        String accNo = sc.nextLine().trim();
         System.out.println(reportService.getAccountStatement(accNo));
     }
 
@@ -301,7 +302,7 @@ public class ConsoleUI {
             System.out.println("4. Cancel Token");
             System.out.println("0. Back");
             System.out.print("Choice: ");
-            switch (obj.nextLine().trim()) {
+            switch (sc.nextLine().trim()) {
                 case "1":
                     issueToken();
                     break;
@@ -322,12 +323,12 @@ public class ConsoleUI {
 
     private void issueToken() {
         System.out.print("Customer Name (Enter for Walk-in): ");
-        String name = obj.nextLine().trim();
+        String name = sc.nextLine().trim();
         System.out.print("Account No (Enter if N/A)        : ");
-        String accNo = obj.nextLine().trim();
+        String accNo = sc.nextLine().trim();
         System.out.println("Service: 1=DEPOSIT  2=WITHDRAWAL  3=ACCOUNT_OPENING  4=LOAN_INQUIRY  5=TRANSFER  6=GENERAL_INQUIRY");
         System.out.print("Choice: ");
-        String svc = obj.nextLine().trim();
+        String svc = sc.nextLine().trim();
         QueueToken.ServiceType serviceType = switch (svc) {
             case "2" -> QueueToken.ServiceType.Withdrawal;
             case "3" -> QueueToken.ServiceType.Account_Opening;
@@ -339,7 +340,7 @@ public class ConsoleUI {
         };
         System.out.println("Priority: 1=NORMAL  2=SENIOR_CITIZEN  3=VIP  4=EMERGENCY");
         System.out.print("Choice: ");
-        String pri = obj.nextLine().trim();
+        String pri = sc.nextLine().trim();
         QueueToken.Priority priority = switch (pri) {
             case "2" -> QueueToken.Priority.Senior_Citizen;
             case "3" -> QueueToken.Priority.VIP;
@@ -380,7 +381,7 @@ public class ConsoleUI {
 
     private void cancelToken() {
         System.out.print("Token Number: ");
-        String tokenNo = obj.nextLine().trim();
+        String tokenNo = sc.nextLine().trim();
         System.out.println(queueService.cancelToken(tokenNo));
     }
 
@@ -396,7 +397,7 @@ public class ConsoleUI {
             System.out.println("6. Reject Loan (Admin)");
             System.out.println("0. Back");
             System.out.print("Choice: ");
-            switch (obj.nextLine().trim()) {
+            switch (sc.nextLine().trim()) {
                 case "1":
                     applyLoan();
                     break;
@@ -423,10 +424,10 @@ public class ConsoleUI {
 
     private void applyLoan() {
         System.out.print("Account Number  : ");
-        String accNo = obj.nextLine().trim();
+        String accNo = sc.nextLine().trim();
         System.out.println("Loan Type: 1=PERSONAL  2=HOME  3=AUTO  4=BUSINESS  5=EDUCATION");
         System.out.print("Choice          : ");
-        String lt = obj.nextLine().trim();
+        String lt = sc.nextLine().trim();
         Loan.LoanType loanType = switch (lt) {
             case "2" -> Loan.LoanType.Home;
             case "3" -> Loan.LoanType.Auto;
@@ -435,17 +436,17 @@ public class ConsoleUI {
             default -> Loan.LoanType.Personal;
         };
         System.out.print("Loan Amount     : PKR ");
-        double amt = Double.parseDouble(obj.nextLine().trim());
+        double amt = Double.parseDouble(sc.nextLine().trim());
         System.out.print("Interest Rate % : ");
-        double rate = Double.parseDouble(obj.nextLine().trim());
+        double rate = Double.parseDouble(sc.nextLine().trim());
         System.out.print("Tenure (months) : ");
-        int tenure = Integer.parseInt(obj.nextLine().trim());
+        int tenure = Integer.parseInt(sc.nextLine().trim());
         System.out.println(loanService.applyLoanString(accNo, loanType, amt, rate, tenure));
     }
 
     private void viewLoans() {
         System.out.print("Account Number: ");
-        String accNo = obj.nextLine().trim();
+        String accNo = sc.nextLine().trim();
         List<Loan> loans = loanService.getAccountLoans(accNo);
         if (loans.isEmpty()) {
             System.out.println("No loans found!");
@@ -457,11 +458,11 @@ public class ConsoleUI {
 
     private void payEmi() {
         System.out.print("Loan ID        : ");
-        String loanId = obj.nextLine().trim();
+        String loanId = sc.nextLine().trim();
         System.out.print("Account Number : ");
-        String accNo = obj.nextLine().trim();
+        String accNo = sc.nextLine().trim();
         System.out.print("PIN            : ");
-        String pin = obj.nextLine().trim();
+        String pin = sc.nextLine().trim();
         System.out.println(loanService.makePayment(loanId, accNo, pin));
     }
 
@@ -477,13 +478,13 @@ public class ConsoleUI {
 
     private void approveLoan() {
         System.out.print("Loan ID: ");
-        String loanId = obj.nextLine().trim();
+        String loanId = sc.nextLine().trim();
         System.out.println(loanService.approveLoan(loanId));
     }
 
     private void rejectLoan() {
         System.out.print("Loan ID: ");
-        String loanId = obj.nextLine().trim();
+        String loanId = sc.nextLine().trim();
         System.out.println(loanService.rejectLoan(loanId));
     }
 
@@ -502,7 +503,7 @@ public class ConsoleUI {
             System.out.println("9. Balance Range Query (BST)");
             System.out.println("0. Back");
             System.out.print("Choice: ");
-            switch (obj.nextLine().trim()) {
+            switch (sc.nextLine().trim()) {
                 case "1":
                     System.out.println(reportService.getBankSummary());
                     break;
@@ -548,22 +549,22 @@ public class ConsoleUI {
 
     private void sortAccountsByBalance() {
         System.out.print("Order (1=Ascending, 2=Descending): ");
-        boolean asc = !obj.nextLine().trim().equals("2");
+        boolean asc = !sc.nextLine().trim().equals("2");
         System.out.println(reportService.getAccountsSortedByBalanceReport(asc));
     }
 
     private void searchAccountByBalance() {
         System.out.print("Enter exact balance to search: ");
-        double bal = Double.parseDouble(obj.nextLine().trim());
+        double bal = Double.parseDouble(sc.nextLine().trim());
         Accounts found = reportService.findAccountByBalance(bal);
         System.out.println(found != null ? "✔ Found: " + found : "✘ No account with that exact balance!");
     }
 
     private void balanceRangeQuery() {
         System.out.print("Min balance: ");
-        double min = Double.parseDouble(obj.nextLine().trim());
+        double min = Double.parseDouble(sc.nextLine().trim());
         System.out.print("Max balance: ");
-        double max = Double.parseDouble(obj.nextLine().trim());
+        double max = Double.parseDouble(sc.nextLine().trim());
         java.util.ArrayList<Accounts> results = reportService.getAccountsInBalanceRange(min, max);
         if (results.isEmpty()) {
             System.out.println("No accounts in this range!");
@@ -574,7 +575,6 @@ public class ConsoleUI {
             System.out.println(i++ + ". " + a);
     }
 
-    // ─── ADMIN PANEL ───
     private void adminPanelMenu() {
         while (true) {
             System.out.println("\n── Admin Panel ──");
@@ -583,20 +583,41 @@ public class ConsoleUI {
             System.out.println("3. View All Transactions");
             System.out.println("0. Back");
             System.out.print("Choice: ");
-            switch (obj.nextLine().trim()) {
+            String choice = sc.nextLine().trim();
+            switch (choice) {
                 case "1":
-                    listAdmins();
+                    System.out.println(accountService.listAdmins());
                     break;
                 case "2":
-                    addAdmin();
+                    addAdminMethod();
                     break;
                 case "3":
-                    allTransactions();
+                    System.out.println(reportService.allTransactions());
                     break;
                 case "0":
                     return;
+                default:
+                    System.out.println("Invalid choice!");
             }
         }
+    }
 
+    private void addAdminMethod() {
+        System.out.println("\n── Add New Admin ──");
+        System.out.print("Username: ");
+        String username = sc.nextLine().trim();
+        System.out.print("Password: ");
+        String password = sc.nextLine().trim();
+        System.out.print("Full Name: ");
+        String fullName = sc.nextLine().trim();
+        System.out.println("Role: 1=SUPER_ADMIN  2=MANAGER  3=TELLER");
+        System.out.print("Choice: ");
+        String roleChoice = sc.nextLine().trim();
+        Admin.AdminRole role = switch (roleChoice) {
+            case "2" -> Admin.AdminRole.Manager;
+            case "3" -> Admin.AdminRole.Teller;
+            default -> Admin.AdminRole.Super_Admin;
+        };
+        System.out.println(accountService.addAdmin(username, password, fullName, role));
     }
 }

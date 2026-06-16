@@ -130,5 +130,17 @@ public class ReportService {
         SortUtil.mergeSortByAmount(list, ascending);
         return list;
     }
+    public String allTransactions() {
+        StringBuilder sb = new StringBuilder("\n── All Transactions ──\n");
+        ArrayList<Transaction> all = BankDatabase.getInstance().getAllTransactions();
+        if (all.isEmpty()) {
+            return "No transactions found!";
+        }
+        for (Transaction txn : all) {
+            sb.append(txn).append("\n");
+        }
+        sb.append("\nTotal: ").append(all.size()).append(" transactions");
+        return sb.toString();
+    }
 }
 
